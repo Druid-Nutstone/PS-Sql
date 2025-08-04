@@ -29,6 +29,12 @@
 		<Copy SourceFiles="PS.Sql-Source.psm1"
 			  DestinationFiles="$(OutDir)PS.Sql.psm1" />
 	</Target>
+
+	<Target Name="CopyPsm1AsRenamed" AfterTargets="Publish">
+		<Copy
+		  SourceFiles="PS.Sql-Source.psm1"
+		  DestinationFiles="$(PublishDir)PS.Sql.psm1" />
+	</Target>	
 	
 	<ItemGroup>
 	  <None Update="PS.Sql.psd1">
