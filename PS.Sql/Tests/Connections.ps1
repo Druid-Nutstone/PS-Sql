@@ -34,6 +34,16 @@ $data = @()
 
 $data += [PSTable]::new("A new first", "A new last")
 
-Add-MsSqlObjectToTable -Connection $connection -DatabaseName $databaseName -TableName $tableName -Data $data
+#Add-MsSqlObjectToTable -Connection $connection -DatabaseName $databaseName -TableName $tableName -Data $data
 
-Get-MsSqlObjectFromTable -Connection $connection -DatabaseName $databaseName -TableName $tableName -TableType PSTable
+#Get-MsSqlObjectFromTable -Connection $connection -DatabaseName $databaseName -TableName $tableName -TableType PSTable
+
+Write-Host "And now as dataset"
+
+$result = Get-MsSql -Connection $connection -DatabaseName $databaseName -Sql "select * from $($tableName)" -Output DataSet `
+          | Find-Table -TableName $tableName `
+          | Set-MsSqlObject -OutputType PSTable  
+
+foreach ($obj in $result) {
+    Write-Host $obj.FirstName
+}
