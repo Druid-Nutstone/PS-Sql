@@ -14,7 +14,7 @@ namespace PS.Sql.Cmdlets
         [Parameter(Mandatory = true, ValueFromPipeline = true)]
         public MsSqlConnectionModel Connection { get; set; }
 
-        [Parameter(Mandatory = true)]
+        [Parameter(Mandatory = false)]
         public string DatabaseName { get; set; }
 
         [Parameter(Mandatory = true)]
@@ -25,9 +25,9 @@ namespace PS.Sql.Cmdlets
 
         protected override void Process()
         {
-            if (string.IsNullOrEmpty(DatabaseName))
+            if (!string.IsNullOrEmpty(DatabaseName))
             {
-                this.ThrowTerminatingError(new ErrorRecord(new ArgumentException("DatabaseName cannot be null or empty"), "InvalidDatabaseName", ErrorCategory.InvalidArgument, null));
+                Connection.WithDatabase(DatabaseName);  
             }
             this.MsSqlService.WithSqlConnection(Connection, MsgHandler)
                              .WithOpenConnection(MsgHandler)

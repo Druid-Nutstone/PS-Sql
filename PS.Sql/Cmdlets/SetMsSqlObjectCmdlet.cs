@@ -15,10 +15,39 @@ namespace PS.Sql.Cmdlets
         [Parameter(Mandatory = true, ValueFromPipeline =true)]
         public DataTable DataTable { get; set; }
 
-        [Parameter(Mandatory = true)]
-        public Type OutputType { get; set; }    
+        [Parameter(Mandatory = false)]
+        public Type? OutputType { get; set; }
+
+        [Parameter(Mandatory = false)]
+        public SwitchParameter AsDynamic { get; set; }
 
         protected override void Process()
+        {
+            if (OutputType != null)
+            {
+                this.ProcessList();
+            }
+            else if (AsDynamic.IsPresent)
+            {
+                this.ProcessDynamic();
+            }
+            else
+            {
+                this.ThrowTerminatingError(new ErrorRecord(new ArgumentException("Either OutputType or AsDynamic must be specified."), "InvalidParameters", ErrorCategory.InvalidArgument, null));
+            }
+        }
+
+        private void ProcessDynamic()
+        {
+            var dynamicList = new List<dynamic>();
+            foreach (DataRow row in DataTable.Rows)
+            {
+                dynamicList.Add(row.RowToDynamic());
+            }
+            this.WriteObject(dynamicList);
+        }
+
+        private void ProcessList()
         {
             var listType = typeof(List<>).MakeGenericType(OutputType);
             var listInstance = Activator.CreateInstance(listType);
@@ -27,7 +56,7 @@ namespace PS.Sql.Cmdlets
             {
                 addMethod.Invoke(listInstance, new object[] { row.RowToObject(OutputType) });
             }
-            this.WriteObject(listInstance); 
+            this.WriteObject(listInstance);
         }
 
     }

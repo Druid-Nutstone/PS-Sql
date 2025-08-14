@@ -1,6 +1,8 @@
-﻿using Nutstone.Persistence.Provider.Models;
+﻿using Nutstone.Persistence.Provider.Extensions;
+using Nutstone.Persistence.Provider.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Management.Automation;
 using System.Text;
@@ -44,11 +46,27 @@ namespace PS.Sql.Cmdlets
                                                       .WithOpenConnection(MsgHandler)
                                                       .WithGetDataTable(Sql, MsgHandler);
                     break;
+                case MsSqlOutputType.Dynamic:
+                    result = this.GetAsDynmaic();
+                    break;
                 default:
                     throw new ArgumentException("Invalid output type specified.");
             }
             this.MsSqlService.WithCloseConnection(MsgHandler);
             this.WriteObject(result);   
+        }
+
+        private object GetAsDynmaic()
+        {
+            var dataTable = this.MsSqlService.WithSqlConnection(Connection, MsgHandler)
+                                              .WithOpenConnection(MsgHandler)
+                                              .WithGetDataTable(Sql, MsgHandler);
+            var dynamicList = new List<dynamic>();
+            foreach (DataRow row in dataTable.Rows)
+            {
+                dynamicList.Add(row.RowToDynamic());
+            }
+            return dynamicList;
         }
     }
 }

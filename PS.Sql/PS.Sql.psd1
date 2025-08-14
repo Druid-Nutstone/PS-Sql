@@ -80,7 +80,9 @@ CmdletsToExport = 'New-MsSqlConnection',
                   'Remove-MsSqlTable',
                   "Get-MsSql",
                   "Find-Table",
-                  "Set-MsSqlObject"
+                  "Set-MsSqlObject",
+                  "Set-MsSqlConnection",
+                  "Set-MsSql"
 
 
 
