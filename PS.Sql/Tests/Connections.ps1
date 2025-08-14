@@ -71,7 +71,7 @@ foreach ($obj in $result) {
 }
 
 Write-Host "Results using dynamic object" 
-$result = Get-MsSql -Connection $connection -Sql "select FirstName as ColumnForName, LastName as ColumnForLastName from $($tableName)" -Output dynamic
+$result = Get-MsSql -Connection $connection -Sql "select FirstName as ColumnForName, LastName as ColumnForLastName from $($tableName)" -Output Dynamic
 
 foreach ($objdyn in $result) {
     Write-Host "FirstName in dynamic $($objdyn.ColumnForName)"
