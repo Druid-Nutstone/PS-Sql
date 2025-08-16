@@ -52,11 +52,6 @@ $recordsUpdated = Set-MsSql -Connection $connection -Sql "Insert into $($tableNa
 
 Write-Host "Inserted records $($recordsUpdated)"
 
-# retrieve the contents of the table into a List<PSTable>  
-$tableAsObject = Get-MsSqlObjectFromTable -Connection $connection -DatabaseName $databaseName -TableName $tableName -TableType PSTable
-
-Write-Host "Table object count is $($tableAsObject.Count)"
-
 
 
 # send an sql selact return as a dataset , find the table in the dataset , populate a list<PSTable> object from the table    
@@ -75,4 +70,30 @@ $result = Get-MsSql -Connection $connection -Sql "select FirstName as ColumnForN
 
 foreach ($objdyn in $result) {
     Write-Host "FirstName in dynamic $($objdyn.ColumnForName)"
+}
+
+# as object list List<PSTable>
+$asListObject = Get-MsSql -Connection $connection -Sql "Select * from $($tableName)" -SqlParameters $sqlParameters -Output Object -Type PSTable
+Write-Host "As list<PSTable>"
+foreach ($obj in $asListObject) {
+    Write-Host "FirstName $($obj.FirstName) LastName $($obj.LastName)"
+}
+
+Write-Host "Using Stored procedure"
+
+# and now using a storedproc 
+$sqlParameters = Add-MsSqlParameter -Name "Name" -Value "hello missus"
+
+# as dataset 
+$asDataset = Get-MsSql -Connection $connection -Sql "TestStoredProc" -SqlParameters $sqlParameters -Input StoredProcedure -Output DataSet
+Write-Host "Table count from ds $($asDataset.Tables.Count)"
+
+# as dynamic 
+$asDataset = Get-MsSql -Connection $connection -Sql "TestStoredProc" -SqlParameters $sqlParameters -Input StoredProcedure -Output Dynamic
+Write-Host "Dynamic first is $($asDataset[0].FirstName)"
+
+# as object list 
+$asobjectList = Get-MsSql -Connection $connection -Sql "TestStoredProc" -SqlParameters $sqlParameters -Input StoredProcedure -Output Object -Type PSTable
+foreach ($obj in $asobjectList) {
+    Write-Host "Obj list from Stored proc - firstname $($obj.FirstName) lastname $($obj.LastName)"
 }

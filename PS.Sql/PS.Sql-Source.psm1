@@ -5,6 +5,8 @@ $script:PlatformDllPath = Join-Path $BasePath 'runtimes\win\lib\net8.0'
 $script:NativePath = Join-Path $BasePath 'runtimes\win-x64\native'  # location of native libraries
 $script:ModuleDllPath = $BasePath  # location of PS.Sql.dll
 
+Write-Host "Loading required modules .."    
+
 $env:COREHOST_TRACE = "1"
 $env:COREHOST_TRACE_VERBOSITY = "4"
 
@@ -17,12 +19,12 @@ function Import-NativeLibrary {
     if (Test-Path $fullPath) {
         try {
             [System.Runtime.InteropServices.NativeLibrary]::Load($fullPath) | Out-Null
-            Write-Verbose "✅ Loaded native library: $dllName"
+            Write-Host "✅ Loaded native library: $dllName"
         } catch {
-            Write-Warning "❌ Failed to load native library '$dllName': $_"
+            Write-Host "❌ Failed to load native library '$dllName': $_"
         }
     } else {
-        Write-Warning "⚠️ Native library not found: $fullPath"
+        Write-Host "⚠️ Native library not found: $fullPath"
     }
 }
 
@@ -35,17 +37,18 @@ function Import-ManagedAssembly {
     if (Test-Path $fullPath) {
         try {
             Add-Type -Path $fullPath -ErrorAction Stop
-            Write-Verbose "Imported managed assembly: $dllName"
+            Write-Host "Imported managed assembly: $dllName"
         } catch {
-            Write-Warning "Failed to import managed assembly '$dllName': $_"
+            Write-Host "Failed to import managed assembly '$dllName': $_"
         }
     } else {
-        Write-Warning "Managed assembly not found: $fullPath"
+        Write-Host "Managed assembly not found: $fullPath"
     }
 }
 Import-NativeLibrary 'Microsoft.Data.SqlClient.SNI.dll' -folder $script:NativePath
 # Microsoft.Identity.Client.dll 
 Import-ManagedAssembly 'Microsoft.Identity.Client.dll' -folder $script:ModuleDllPath
+Import-ManagedAssembly 'Microsoft.SqlServer.Server.dll' -folder $script:ModuleDllPath
 # Load platform-specific Microsoft.Data.SqlClient.dll for .NET 8
 Import-ManagedAssembly 'Microsoft.Data.SqlClient.dll' -folder $script:PlatformDllPath
 

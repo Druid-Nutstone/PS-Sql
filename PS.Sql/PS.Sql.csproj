@@ -25,18 +25,20 @@
 		<PlatformTarget>x64</PlatformTarget>
 	</PropertyGroup>
 
-	<Target Name="CopyPsm1AsRenamed" AfterTargets="Build">
-		<Copy SourceFiles="PS.Sql-Source.psm1"
-			  DestinationFiles="$(OutDir)PS.Sql.psm1" />
+	<Target Name="RenamePsm1" AfterTargets="Build">
+		<Copy SourceFiles="$(OutDir)PS.Sql-Source.psm1"
+			  DestinationFiles="$(OutDir)PS.Sql.psm1"
+			  SkipUnchangedFiles="false" />
 	</Target>
 
 	<Target Name="CopyPsm1AsRenamed" AfterTargets="Publish">
-		<Copy
-		  SourceFiles="PS.Sql-Source.psm1"
-		  DestinationFiles="$(PublishDir)PS.Sql.psm1" />
+		<Copy SourceFiles="PS.Sql-Source.psm1" DestinationFiles="$(PublishDir)PS.Sql.psm1" />
 	</Target>	
 	
 	<ItemGroup>
+	  <None Update="PS.Sql-Source.psm1">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	  <None Update="PS.Sql.psd1">
 		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>		
